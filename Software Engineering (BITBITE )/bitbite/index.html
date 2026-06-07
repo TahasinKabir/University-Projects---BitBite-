@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BitBite — Smart Nutrition Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ════════════════ NAV ════════════════ -->
+<nav>
+  <div class="logo" onclick="navClick()">
+    <div class="logo-ic"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm-1 14v-2h2v2h-2zm3.94-5.2L14 11.67V16h-4v-4.33l-.94-.87C7.79 10.01 7 9.56 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 .56-.79 1.01-2.06 1.8z"/></svg></div>
+    <span class="logo-nm">BitBite</span>
+  </div>
+  <div class="nav-tabs" id="navTabs" style="display:none">
+    <button class="nt on" onclick="goDash()">📊 Dashboard</button>
+    <button class="nt" onclick="goMeals()">🍽️ Meals</button>
+    <button class="nt" onclick="goLog()">📝 Food Log</button>
+    <button class="nt" onclick="goAI()">🤖 AI Coach</button>
+    <button class="nt" onclick="goProgress()">📈 Progress</button>
+    <button class="nt" onclick="goTools()">🧰 Tools</button>
+  </div>
+  <div class="nav-r">
+    <div id="guestBtns" style="display:flex;gap:8px">
+      <button class="nbtn nbtn-out" onclick="show('login')">Log in</button>
+      <button class="nbtn nbtn-pri" onclick="show('signup')">Get started →</button>
+    </div>
+    <div class="av-wrap" id="uMenu" style="display:none">
+      <div style="position:relative;margin-right:4px">
+        <button onclick="goNotifs()" style="background:var(--bg);border:1px solid var(--bdr);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:.15s" onmouseover="this.style.background='var(--gp)'" onmouseout="this.style.background='var(--bg)'">🔔</button>
+        <div id="notifDot" style="position:absolute;top:1px;right:1px;width:10px;height:10px;border-radius:50%;background:var(--co);border:2px solid #fff;display:block"></div>
+      </div>
+      <div class="av" id="avBtn" onclick="toggleMenu()"></div>
+      <div class="av-menu" id="avMenu">
+        <div class="av-item" style="font-weight:700;pointer-events:none;color:var(--mut);font-size:12px" id="menuName"></div>
+        <div class="av-sep"></div>
+        <div class="av-item" onclick="goProfile()">👤 My Profile</div>
+        <div class="av-item" onclick="goDash()">📊 Dashboard</div>
+        <div class="av-item" onclick="goProgress()">📈 Progress</div>
+        <div class="av-item" onclick="goNotifs()">🔔 Notifications <span class="notif-badge"></span></div>
+        <div class="av-sep"></div>
+        <div class="av-item red" onclick="logout()">🚪 Sign out</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ════════════════ LOGIN ════════════════ -->
+<div class="scr on" id="scr-login">
+<div class="auth-bg">
+<div class="auth-split">
+  <div class="auth-left">
+    <div class="al-logo">
+      <div class="al-logo-ic"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm-1 14v-2h2v2h-2zm3.94-5.2L14 11.67V16h-4v-4.33l-.94-.87C7.79 10.01 7 9.56 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 .56-.79 1.01-2.06 1.8z"/></svg></div>
+      <span class="al-logo-nm">BitBite</span>
+    </div>
+    <div class="al-title">Your body.<br>Your data.<br>Your plan.</div>
+    <div class="al-sub">BitBite connects wearable fitness data with AI-powered nutrition — personalized to your exact goals and budget.</div>
+    <div class="al-features">
+      <div class="al-feat"><div class="al-feat-ic">⌚</div>Real-time wearable sync & activity tracking</div>
+      <div class="al-feat"><div class="al-feat-ic">🧮</div>Science-based calorie & macro calculation</div>
+      <div class="al-feat"><div class="al-feat-ic">🤖</div>AI meal plans tailored to your budget</div>
+      <div class="al-feat"><div class="al-feat-ic">📈</div>7-day health predictions & trend analysis</div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-title">Welcome back</div>
+    <div class="auth-sub-t">Sign in to continue your health journey</div>
+    <div class="err-box" id="loginErr">❌ No account found. Please create an account first.</div>
+    <div class="fg"><label class="fl">Email address</label><input class="fi" id="lEmail" type="email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="fg"><label class="fl">Password</label><input class="fi" id="lPass" type="password" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()">
+      <div style="text-align:right;font-size:12px;color:var(--g);cursor:pointer;margin-top:5px;font-weight:600">Forgot password?</div>
+    </div>
+    <button class="fbtn" onclick="doLogin()">Sign in to BitBite</button>
+    <div class="divdr">or continue with</div>
+    <div class="soc-row">
+      <button class="soc-btn" onclick="doSocLogin()"><span style="font-weight:700;color:#4285F4">G</span> Google</button>
+      <button class="soc-btn" onclick="doSocLogin()"><span style="font-weight:700;color:#1877F2">f</span> Facebook</button>
+    </div>
+    <div class="auth-sw">No account yet? <a onclick="show('signup')">Create one free →</a></div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ════════════════ SIGNUP ════════════════ -->
+<div class="scr" id="scr-signup">
+<div class="auth-bg">
+<div class="auth-split">
+  <div class="auth-left">
+    <div class="al-logo">
+      <div class="al-logo-ic"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7zm-1 14v-2h2v2h-2zm3.94-5.2L14 11.67V16h-4v-4.33l-.94-.87C7.79 10.01 7 9.56 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 .56-.79 1.01-2.06 1.8z"/></svg></div>
+      <span class="al-logo-nm">BitBite</span>
+    </div>
+    <div class="al-title">Start your health transformation today.</div>
+    <div class="al-sub">Takes only 3 minutes. Get a personalized nutrition plan based on your unique body, goals, and lifestyle.</div>
+    <div class="al-features">
+      <div class="al-feat"><div class="al-feat-ic">✅</div>Free forever — no credit card needed</div>
+      <div class="al-feat"><div class="al-feat-ic">🔒</div>Your data is encrypted and private</div>
+      <div class="al-feat"><div class="al-feat-ic">🎯</div>Goal-specific plans that actually work</div>
+      <div class="al-feat"><div class="al-feat-ic">💰</div>Budget-friendly meals starting ৳200/day</div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-title">Create your account</div>
+    <div class="auth-sub-t">Join thousands building healthier habits</div>
+    <div class="err-box" id="signupErr"></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">First name</label><input class="fi" id="sFirst" type="text" placeholder="Araf"></div>
+      <div class="fg"><label class="fl">Last name</label><input class="fi" id="sLast" type="text" placeholder="Khan"></div>
+    </div>
+    <div class="fg"><label class="fl">Email address</label><input class="fi" id="sEmail" type="email" placeholder="you@example.com"></div>
+    <div class="fg"><label class="fl">Password</label><input class="fi" id="sPass" type="password" placeholder="Min. 8 characters"></div>
+    <div style="font-size:12px;color:var(--mut);margin-bottom:12px;line-height:1.6">By signing up you agree to our <span style="color:var(--g);cursor:pointer;font-weight:600">Terms of Service</span> and <span style="color:var(--g);cursor:pointer;font-weight:600">Privacy Policy</span>.</div>
+    <button class="fbtn" onclick="doSignup()">Create account & set up profile →</button>
+    <div class="divdr">or sign up with</div>
+    <div class="soc-row">
+      <button class="soc-btn" onclick="doSocSignup()"><span style="font-weight:700;color:#4285F4">G</span> Google</button>
+      <button class="soc-btn" onclick="doSocSignup()"><span style="font-weight:700;color:#1877F2">f</span> Facebook</button>
+    </div>
+    <div class="auth-sw">Already have an account? <a onclick="show('login')">Sign in</a></div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- ════════════════ ONBOARDING ════════════════ -->
+<div class="scr" id="scr-ob">
+<div class="ob-bg">
+<div class="ob-wrap">
+  <div class="ob-hdr">
+    <div class="ob-bars" id="obBars"></div>
+    <div class="ob-meta">
+      <span id="obTxt" class="ob-step-badge"></span>
+      <span id="obTime" style="color:var(--mut);font-size:12px"></span>
+    </div>
+  </div>
+  <div id="obBody"></div>
+</div>
+</div>
+</div>
+
+<!-- ════════════════ RESULT ════════════════ -->
+<div class="scr" id="scr-result">
+  <div class="res-wrap" id="resContent"></div>
+</div>
+
+<!-- ════════════════ DASHBOARD ════════════════ -->
+<div class="scr" id="scr-dash">
+  <div class="app-body" id="dashContent"></div>
+</div>
+
+<!-- ════════════════ MEALS ════════════════ -->
+<div class="scr" id="scr-meals">
+  <div class="app-body" id="mealContent"></div>
+</div>
+
+<!-- ════════════════ FOOD LOG ════════════════ -->
+<div class="scr" id="scr-log">
+  <div class="app-body" id="logContent"></div>
+</div>
+
+<!-- ════════════════ AI COACH ════════════════ -->
+<div class="scr" id="scr-ai">
+  <div class="app-body" id="aiContent"></div>
+</div>
+
+<!-- ════════════════ PROGRESS ════════════════ -->
+<div class="scr" id="scr-progress">
+  <div class="app-body" id="progressContent"></div>
+</div>
+
+<!-- ════════════════ PROFILE ════════════════ -->
+<div class="scr" id="scr-prof">
+  <div class="app-body" id="profContent"></div>
+</div>
+
+<!-- ════════════════ TOOLS ════════════════ -->
+<div class="scr" id="scr-tools">
+  <div class="app-body" id="toolsContent"></div>
+</div>
+
+<!-- ════════════════ NOTIFICATIONS ════════════════ -->
+<div class="scr" id="scr-notifs">
+  <div class="app-body" id="notifsContent"></div>
+</div>
+
+<!-- ════════════════ BMI TOOL ════════════════ -->
+<div class="scr" id="scr-bmi">
+  <div class="app-body" id="bmiContent"></div>
+</div>
+
+<!-- ════════════════ CALORIE CALC ════════════════ -->
+<div class="scr" id="scr-calcal">
+  <div class="app-body" id="calcalContent"></div>
+</div>
+
+<!-- ════════════════ SLEEP TRACKER ════════════════ -->
+<div class="scr" id="scr-sleep">
+  <div class="app-body" id="sleepContent"></div>
+</div>
+
+<!-- ════════════════ WATER TRACKER (full page) ════════════════ -->
+<div class="scr" id="scr-water">
+  <div class="app-body" id="waterContent"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ════════════════ SCRIPT ════════════════ -->
+<script src="script.js"></script>
+</body>
+</html>
