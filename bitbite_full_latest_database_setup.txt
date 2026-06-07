@@ -1,0 +1,648 @@
+-- =====================================================
+-- BitBite FULL Latest Database Setup for XAMPP/phpMyAdmin
+-- This file contains the main database + all latest added features.
+-- Use on a new laptop/fresh setup.
+-- Database: bitbite_db
+-- Demo user login: araf@example.com / 12345678
+-- Demo admin login: admin@bitbite.com / admin12345
+-- =====================================================
+
+-- BitBite Database Setup for XAMPP / phpMyAdmin
+-- Database: bitbite_db
+-- Sample login:
+-- Email: araf@example.com
+-- Password: 12345678
+--
+-- How to use:
+-- 1. Open XAMPP and start Apache + MySQL.
+-- 2. Open phpMyAdmin.
+-- 3. Click SQL tab.
+-- 4. Paste this full code and Run.
+-- OR import this .sql file directly.
+
+CREATE DATABASE IF NOT EXISTS bitbite_db
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+USE bitbite_db;
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS wearable_logs;
+DROP TABLE IF EXISTS user_settings;
+DROP TABLE IF EXISTS achievements;
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS sleep_logs;
+DROP TABLE IF EXISTS shopping_list;
+DROP TABLE IF EXISTS meal_plans;
+DROP TABLE IF EXISTS water_logs;
+DROP TABLE IF EXISTS weight_logs;
+DROP TABLE IF EXISTS food_logs;
+DROP TABLE IF EXISTS profiles;
+DROP TABLE IF EXISTS users;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- =========================
+-- 1. USERS TABLE
+-- =========================
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100),
+    name VARCHAR(200) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================
+-- 2. PROFILES TABLE
+-- =========================
+CREATE TABLE profiles (
+    user_id INT PRIMARY KEY,
+    goal VARCHAR(50) DEFAULT 'lose',
+    body_type VARCHAR(50) DEFAULT 'average',
+    age INT DEFAULT 22,
+    gender VARCHAR(50) DEFAULT 'male',
+    height DECIMAL(6,2) DEFAULT 170,
+    weight DECIMAL(6,2) DEFAULT 70,
+    target_weight DECIMAL(6,2) DEFAULT 65,
+    body_fat DECIMAL(5,2) DEFAULT 22,
+    activity_level VARCHAR(50) DEFAULT 'moderate',
+    diet_pref JSON,
+    health_cond JSON,
+    budget DECIMAL(10,2) DEFAULT 500,
+    wearable VARCHAR(100) DEFAULT 'none',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================
+-- 3. FOOD LOGS TABLE
+-- =========================
+CREATE TABLE food_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    emoji VARCHAR(20) DEFAULT '🍽️',
+    food_name VARCHAR(255) NOT NULL,
+    calories INT NOT NULL,
+    meal_type VARCHAR(100) DEFAULT 'Custom',
+    logged_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================
+-- 4. WEIGHT LOGS TABLE
+-- =========================
+CREATE TABLE weight_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    weight DECIMAL(6,2) NOT NULL,
+    note VARCHAR(255) DEFAULT '',
+    logged_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================
+-- 5. WATER LOGS TABLE
+-- =========================
+CREATE TABLE water_logs (
+    user_id INT PRIMARY KEY,
+    cups DECIMAL(5,2) DEFAULT 0,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================
+-- 6. MEAL PLANS TABLE
+-- =========================
+CREATE TABLE meal_plans (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    meal_day VARCHAR(100) NOT NULL,
+    meal_type VARCHAR(100) NOT NULL,
+    meal_name VARCHAR(255) NOT NULL,
+    emoji VARCHAR(20) DEFAULT '🍽️',
+    calories INT DEFAULT 0,
+    carbs VARCHAR(50),
+    protein VARCHAR(50),
+    fat VARCHAR(50),
+    cost DECIMAL(10,2) DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================
+-- 7. SHOPPING LIST TABLE
+-- =========================
+CREATE TABLE shopping_list (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    item_name VARCHAR(255) NOT NULL,
+    category VARCHAR(100),
+    quantity VARCHAR(100),
+    price DECIMAL(10,2) DEFAULT 0,
+    is_checked BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================
+-- 8. SLEEP LOGS TABLE
+-- =========================
+CREATE TABLE sleep_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    sleep_date DATE DEFAULT (CURRENT_DATE),
+    hours DECIMAL(4,2) NOT NULL,
+    quality VARCHAR(50) DEFAULT 'Fair',
+    bedtime TIME,
+    wake_time TIME,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================
+-- 9. NOTIFICATIONS TABLE
+-- =========================
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    icon VARCHAR(20) DEFAULT '🔔',
+    title VARCHAR(255) NOT NULL,
+    message TEXT,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================
+-- 10. ACHIEVEMENTS TABLE
+-- =========================
+CREATE TABLE achievements (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    achievement_name VARCHAR(150) NOT NULL,
+    icon VARCHAR(20),
+    is_unlocked BOOLEAN DEFAULT FALSE,
+    unlocked_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================
+-- 11. USER SETTINGS TABLE
+-- =========================
+CREATE TABLE user_settings (
+    user_id INT PRIMARY KEY,
+    meal_reminders BOOLEAN DEFAULT TRUE,
+    ai_health_insights BOOLEAN DEFAULT TRUE,
+    budget_alerts BOOLEAN DEFAULT FALSE,
+    weekly_report_email BOOLEAN DEFAULT TRUE,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================
+-- 12. WEARABLE LOGS TABLE
+-- =========================
+CREATE TABLE wearable_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    log_date DATE DEFAULT (CURRENT_DATE),
+    steps INT DEFAULT 0,
+    calories_burned INT DEFAULT 0,
+    heart_rate INT DEFAULT 0,
+    spo2 INT DEFAULT 0,
+    sleep_hours DECIMAL(4,2) DEFAULT 0,
+    hrv INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =========================
+-- SAMPLE DATA
+-- =========================
+
+-- Sample user password is: 12345678
+INSERT INTO users 
+(first_name, last_name, name, email, password_hash)
+VALUES
+(
+    'Araf',
+    'Khan',
+    'Araf Khan',
+    'araf@example.com',
+    '$2y$12$zbGXP6YPVAZXpqloBrnYd.C9ndd.sY4w/vdCwXpbAQ3bhJmVBz1ly'
+);
+
+INSERT INTO profiles 
+(user_id, goal, body_type, age, gender, height, weight, target_weight, body_fat, activity_level, diet_pref, health_cond, budget, wearable)
+VALUES
+(
+    1,
+    'lose',
+    'average',
+    22,
+    'male',
+    170,
+    70,
+    65,
+    22,
+    'moderate',
+    JSON_ARRAY('Halal', 'High-protein'),
+    JSON_ARRAY('None'),
+    500,
+    'none'
+);
+
+INSERT INTO food_logs 
+(user_id, emoji, food_name, calories, meal_type)
+VALUES
+(1, '🥣', 'Oats with banana', 320, 'Breakfast'),
+(1, '🍛', 'Lentil dal with rice', 520, 'Lunch'),
+(1, '🥜', 'Mixed nuts', 180, 'Snack'),
+(1, '🍲', 'Grilled chicken khichuri', 600, 'Dinner');
+
+INSERT INTO weight_logs 
+(user_id, weight, note)
+VALUES
+(1, 70, 'Starting weight');
+
+INSERT INTO water_logs 
+(user_id, cups)
+VALUES
+(1, 5);
+
+INSERT INTO meal_plans 
+(user_id, meal_day, meal_type, meal_name, emoji, calories, carbs, protein, fat, cost)
+VALUES
+(1, 'Friday', 'Breakfast', 'Oats + banana + chia seeds', '🥣', 420, '48g', '12g', '7g', 85),
+(1, 'Friday', 'Lunch', 'Lentil dal + brown rice + spinach', '🍛', 650, '72g', '22g', '6g', 140),
+(1, 'Friday', 'Snack', 'Mixed nuts and dates', '🥜', 190, '18g', '6g', '12g', 50),
+(1, 'Friday', 'Dinner', 'Grilled chicken khichuri', '🍲', 600, '65g', '38g', '11g', 120),
+(1, 'Saturday', 'Breakfast', 'Egg paratha + green tea', '🫓', 400, '45g', '18g', '14g', 75),
+(1, 'Saturday', 'Lunch', 'Fish curry + brown rice + salad', '🐟', 620, '68g', '28g', '10g', 130),
+(1, 'Saturday', 'Snack', 'Greek yogurt + honey', '🥛', 180, '20g', '8g', '3g', 45),
+(1, 'Saturday', 'Dinner', 'Veg stir-fry + whole wheat roti', '🥦', 540, '52g', '14g', '9g', 95);
+
+INSERT INTO shopping_list
+(user_id, item_name, category, quantity, price, is_checked)
+VALUES
+(1, 'Oats', 'Grains', '500g', 120, FALSE),
+(1, 'Brown rice', 'Grains', '1kg', 150, FALSE),
+(1, 'Chicken breast', 'Protein', '500g', 250, FALSE),
+(1, 'Lentils', 'Legumes', '500g', 100, FALSE),
+(1, 'Eggs', 'Protein', '12 pcs', 140, FALSE),
+(1, 'Banana', 'Fruit', '6 pcs', 80, FALSE),
+(1, 'Spinach', 'Vegetables', '1 bunch', 40, FALSE),
+(1, 'Mixed nuts', 'Snacks', '100g', 130, FALSE);
+
+INSERT INTO sleep_logs
+(user_id, sleep_date, hours, quality, bedtime, wake_time)
+VALUES
+(1, CURDATE(), 7.5, 'Good', '23:00:00', '06:30:00'),
+(1, DATE_SUB(CURDATE(), INTERVAL 1 DAY), 6.2, 'Fair', '00:15:00', '06:25:00'),
+(1, DATE_SUB(CURDATE(), INTERVAL 2 DAY), 8.1, 'Excellent', '22:45:00', '06:50:00'),
+(1, DATE_SUB(CURDATE(), INTERVAL 3 DAY), 5.8, 'Poor', '01:00:00', '06:45:00');
+
+INSERT INTO notifications
+(user_id, icon, title, message, is_read)
+VALUES
+(1, '🏆', '7-day streak achieved!', 'You logged meals for 7 days in a row. Amazing consistency!', FALSE),
+(1, '💧', 'Hydration reminder', 'You are behind your water goal today. Drink one glass now.', FALSE),
+(1, '🍽️', 'Dinner time!', 'Time for your planned grilled chicken khichuri.', TRUE),
+(1, '🤖', 'AI insight', 'Your sleep score is low this week. Add more magnesium-rich foods.', TRUE);
+
+INSERT INTO achievements
+(user_id, achievement_name, icon, is_unlocked, unlocked_at)
+VALUES
+(1, '7-day Streak', '🔥', TRUE, NOW()),
+(1, '10k Steps', '🏆', TRUE, NOW()),
+(1, 'Hydration Pro', '💧', TRUE, NOW()),
+(1, 'Veggie Week', '🥗', TRUE, NOW()),
+(1, 'Mindful Eater', '🧘', FALSE, NULL),
+(1, 'Power Week', '⚡', FALSE, NULL),
+(1, 'Protein King', '💪', FALSE, NULL);
+
+INSERT INTO user_settings
+(user_id, meal_reminders, ai_health_insights, budget_alerts, weekly_report_email)
+VALUES
+(1, TRUE, TRUE, FALSE, TRUE);
+
+INSERT INTO wearable_logs
+(user_id, log_date, steps, calories_burned, heart_rate, spo2, sleep_hours, hrv)
+VALUES
+(1, CURDATE(), 8241, 541, 72, 98, 6.2, 42),
+(1, DATE_SUB(CURDATE(), INTERVAL 1 DAY), 7600, 490, 74, 97, 7.1, 45),
+(1, DATE_SUB(CURDATE(), INTERVAL 2 DAY), 10050, 620, 70, 99, 8.0, 50);
+
+-- =========================
+-- CHECK TABLES
+-- =========================
+SHOW TABLES;
+
+
+-- =====================================================
+-- LATEST EXTRA FEATURES UPDATE
+-- Nutritionists, Yoga Coaches, Research Hub, Article Reads,
+-- Rewards, Confirmed Claim Delivery, Daily Challenges, Saved Articles,
+-- Streak/Admin tables and sample data.
+-- =====================================================
+
+-- BitBite Extra Features Update SQL for XAMPP / phpMyAdmin
+-- Use this AFTER running your main BitBite database setup.
+-- This version is safe for old databases: it creates missing tables and adds missing payment columns.
+-- Default admin login: admin@bitbite.com / admin12345
+
+USE bitbite_db;
+
+
+-- =========================
+-- ADMIN LOGIN TABLE
+-- =========================
+CREATE TABLE IF NOT EXISTS admins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO admins (name, email, password_hash)
+VALUES ('BitBite Admin', 'admin@bitbite.com', '$2y$12$wP42Wg.TNcAWK0qAiDnVd.80ijmHuynnLh3FN560DPz0ieooJjAIC')
+ON DUPLICATE KEY UPDATE name = VALUES(name);
+
+CREATE TABLE IF NOT EXISTS nutritionists (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(150) NOT NULL,
+    specialization VARCHAR(150) NOT NULL,
+    experience_years INT DEFAULT 0,
+    consultation_type VARCHAR(100) DEFAULT 'Online',
+    fee DECIMAL(10,2) DEFAULT 0,
+    rating DECIMAL(3,1) DEFAULT 4.8,
+    bio TEXT,
+    is_available BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS yoga_coaches (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(150) NOT NULL,
+    yoga_type VARCHAR(150) NOT NULL,
+    experience_years INT DEFAULT 0,
+    session_type VARCHAR(100) DEFAULT 'Online',
+    fee DECIMAL(10,2) DEFAULT 0,
+    rating DECIMAL(3,1) DEFAULT 4.8,
+    description TEXT,
+    is_available BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS nutritionist_hires (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    nutritionist_name VARCHAR(150) NOT NULL,
+    specialization VARCHAR(150),
+    experience_years INT DEFAULT 0,
+    consultation_type VARCHAR(100) DEFAULT 'Online',
+    session_date DATE,
+    session_time TIME,
+    fee DECIMAL(10,2) DEFAULT 0,
+    status VARCHAR(50) DEFAULT 'Pending',
+    payment_method VARCHAR(100) DEFAULT 'Cash after session',
+    payment_status VARCHAR(50) DEFAULT 'Pending',
+    transaction_id VARCHAR(150),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS yoga_coach_hires (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    coach_name VARCHAR(150) NOT NULL,
+    yoga_type VARCHAR(150),
+    experience_years INT DEFAULT 0,
+    session_type VARCHAR(100) DEFAULT 'Online',
+    session_date DATE,
+    session_time TIME,
+    fee DECIMAL(10,2) DEFAULT 0,
+    status VARCHAR(50) DEFAULT 'Pending',
+    payment_method VARCHAR(100) DEFAULT 'Cash after session',
+    payment_status VARCHAR(50) DEFAULT 'Pending',
+    transaction_id VARCHAR(150),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS research_hub_articles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    category VARCHAR(100),
+    author_name VARCHAR(150),
+    article_summary TEXT,
+    article_content LONGTEXT,
+    image_url VARCHAR(255),
+    reading_time VARCHAR(50),
+    published_date DATE DEFAULT (CURRENT_DATE),
+    is_featured BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS research_article_reads (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    article_id INT NOT NULL,
+    read_count INT DEFAULT 1,
+    first_read_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_read_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_user_article (user_id, article_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (article_id) REFERENCES research_hub_articles(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Add columns only if they are missing. Works in phpMyAdmin/XAMPP MySQL and MariaDB.
+DROP PROCEDURE IF EXISTS add_col_if_missing;
+DELIMITER $$
+CREATE PROCEDURE add_col_if_missing(IN tbl VARCHAR(64), IN col VARCHAR(64), IN col_def TEXT)
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = tbl AND COLUMN_NAME = col
+    ) THEN
+        SET @sql = CONCAT('ALTER TABLE `', tbl, '` ADD COLUMN `', col, '` ', col_def);
+        PREPARE stmt FROM @sql;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    END IF;
+END$$
+DELIMITER ;
+
+CALL add_col_if_missing('nutritionist_hires', 'payment_method', "VARCHAR(100) DEFAULT 'Cash after session'");
+CALL add_col_if_missing('nutritionist_hires', 'payment_status', "VARCHAR(50) DEFAULT 'Pending'");
+CALL add_col_if_missing('nutritionist_hires', 'transaction_id', "VARCHAR(150) NULL");
+CALL add_col_if_missing('yoga_coach_hires', 'payment_method', "VARCHAR(100) DEFAULT 'Cash after session'");
+CALL add_col_if_missing('yoga_coach_hires', 'payment_status', "VARCHAR(50) DEFAULT 'Pending'");
+CALL add_col_if_missing('yoga_coach_hires', 'transaction_id', "VARCHAR(150) NULL");
+
+DROP PROCEDURE IF EXISTS add_col_if_missing;
+
+INSERT INTO nutritionists
+(id, full_name, specialization, experience_years, consultation_type, fee, rating, bio, is_available)
+VALUES
+(1, 'Dr. Nusrat Jahan', 'Weight Loss Nutrition', 5, 'Online', 800, 4.9, 'Weight loss nutritionist focused on realistic Bangladeshi meal plans and healthy habits.', TRUE),
+(2, 'Tanvir Ahmed', 'Sports Nutrition', 4, 'Online / Offline', 1000, 4.8, 'Sports nutrition coach for muscle gain, protein planning, gym diet, and recovery support.', TRUE),
+(3, 'Farhana Rahman', 'PCOS and Women Health Nutrition', 6, 'Online', 1200, 4.9, 'PCOS-friendly food plans, weight management, balanced meals, and sustainable lifestyle changes.', TRUE),
+(4, 'Mahin Islam', 'Diabetes Friendly Diet', 7, 'Offline', 1500, 4.7, 'Diabetes-friendly meal planning, low sugar choices, and daily food habit correction.', TRUE),
+(5, 'Sabrina Akter', 'Clinical Nutrition', 8, 'Online / Offline', 1800, 4.9, 'Clinical diet support for cholesterol, anemia, hypertension, and long-term health goals.', TRUE),
+(6, 'Arif Hossain', 'Budget Meal Planning', 3, 'Online', 600, 4.6, 'Affordable Bangladeshi meal planning for students, busy people, and tight budgets.', TRUE),
+(7, 'Dr. Samia Karim', 'Weight Gain Nutrition', 6, 'Online', 1100, 4.8, 'Healthy weight gain plans with calorie surplus, protein timing, and digestion-friendly meals.', TRUE),
+(8, 'Mehedi Hasan', 'Muscle Gain Diet', 5, 'Offline', 1300, 4.7, 'Gym-focused diet plans for lean bulking, strength training recovery, and macro tracking.', TRUE),
+(9, 'Nadia Sultana', 'Family Nutrition', 4, 'Online / Offline', 900, 4.6, 'Family meal planning, children-friendly meals, and healthier home food choices.', TRUE),
+(10, 'Rumana Islam', 'Heart Healthy Diet', 9, 'Online', 1600, 4.9, 'Heart-friendly nutrition, low sodium meals, cholesterol control, and lifestyle guidance.', TRUE)
+ON DUPLICATE KEY UPDATE
+full_name=VALUES(full_name), specialization=VALUES(specialization), experience_years=VALUES(experience_years), consultation_type=VALUES(consultation_type), fee=VALUES(fee), rating=VALUES(rating), bio=VALUES(bio), is_available=VALUES(is_available);
+
+INSERT INTO yoga_coaches
+(id, full_name, yoga_type, experience_years, session_type, fee, rating, description, is_available)
+VALUES
+(1, 'Sadia Rahman', 'Beginner Yoga', 3, 'Online', 500, 4.8, 'Beginner-friendly sessions for flexibility, breathing, and daily movement.', TRUE),
+(2, 'Mahmud Hasan', 'Weight Loss Yoga', 6, 'Offline', 700, 4.7, 'Fat loss, mobility, and stamina-focused yoga sessions.', TRUE),
+(3, 'Nabila Karim', 'Stress Relief Yoga', 5, 'Online', 650, 4.9, 'Calming yoga sessions for stress relief, sleep support, and breathing control.', TRUE),
+(4, 'Rafi Chowdhury', 'Power Yoga', 7, 'Online / Offline', 1000, 4.8, 'Strength, balance, core control, and active yoga training.', TRUE),
+(5, 'Mim Akter', 'Women Fitness Yoga', 4, 'Online', 750, 4.7, 'Women-focused flexibility, posture, and general fitness yoga.', TRUE),
+(6, 'Sakib Rahman', 'Flexibility Yoga', 5, 'Offline', 800, 4.6, 'Flexibility improvement, mobility drills, and posture correction.', TRUE),
+(7, 'Jannatul Ferdous', 'Meditation and Breathing', 8, 'Online', 900, 4.9, 'Breathing, meditation, mindfulness, and relaxation-focused sessions.', TRUE),
+(8, 'Aminul Islam', 'Back Pain Yoga', 6, 'Online / Offline', 1100, 4.8, 'Gentle back pain support, mobility, and posture-based yoga.', TRUE),
+(9, 'Tasmia Noor', 'Morning Yoga', 3, 'Online', 550, 4.6, 'Short morning routines for energy, consistency, and healthy habits.', TRUE),
+(10, 'Riad Hasan', 'Advanced Yoga', 9, 'Offline', 1300, 4.9, 'Advanced balance, strength, flexibility, and long-session yoga practice.', TRUE)
+ON DUPLICATE KEY UPDATE
+full_name=VALUES(full_name), yoga_type=VALUES(yoga_type), experience_years=VALUES(experience_years), session_type=VALUES(session_type), fee=VALUES(fee), rating=VALUES(rating), description=VALUES(description), is_available=VALUES(is_available);
+
+INSERT INTO research_hub_articles
+(id, title, category, author_name, article_summary, article_content, image_url, reading_time, published_date, is_featured)
+VALUES
+(1, 'Benefits of Drinking Enough Water Daily', 'Hydration', 'BitBite Research Team', 'Learn how proper hydration improves metabolism, energy and focus.', 'Water supports digestion, metabolism, body temperature, and physical performance. Drinking enough water throughout the day may reduce fatigue and help you stay consistent with nutrition habits.', 'images/hydration.jpg', '4 min read', CURDATE(), TRUE),
+(2, 'How Protein Helps in Weight Loss', 'Nutrition', 'BitBite Research Team', 'Protein helps control hunger and maintain muscle during fat loss.', 'Protein increases fullness, supports muscle repair, and helps maintain lean mass during calorie deficit. Adding protein to each meal can make a weight-loss diet easier to follow.', 'images/protein.jpg', '5 min read', CURDATE(), TRUE),
+(3, 'Why Sleep Matters for Fitness Progress', 'Sleep Health', 'BitBite Research Team', 'Good sleep improves recovery, hormones and daily energy.', 'Sleep affects hunger hormones, cravings, muscle recovery, and focus. Poor sleep may increase appetite and reduce workout performance.', 'images/sleep.jpg', '6 min read', CURDATE(), FALSE),
+(4, 'Simple Yoga for Stress Relief', 'Yoga', 'BitBite Research Team', 'Basic yoga practices can reduce stress and improve flexibility.', 'Yoga supports breathing, flexibility, balance, and mental calmness. Regular beginner yoga can support both physical and emotional health.', 'images/yoga.jpg', '5 min read', CURDATE(), FALSE),
+(5, 'Budget-Friendly Healthy Eating in Bangladesh', 'Budget Nutrition', 'BitBite Research Team', 'Healthy eating can be affordable with local foods.', 'Rice, dal, eggs, seasonal vegetables, fish, chickpeas, and fruits can create balanced meals without overspending. Planning meals before shopping helps reduce waste and cost.', 'images/budget.jpg', '5 min read', CURDATE(), TRUE),
+(6, 'Understanding Calories Without Fear', 'Calories', 'BitBite Research Team', 'Calories are energy, not something to fear.', 'Calories help measure food energy. Weight loss usually needs a calorie deficit, while weight gain needs a surplus. The goal is balance, not extreme restriction.', 'images/calories.jpg', '4 min read', CURDATE(), FALSE),
+(7, 'Why Fiber Is Important for Digestion', 'Digestive Health', 'BitBite Research Team', 'Fiber supports digestion and keeps you full longer.', 'Fiber from vegetables, fruits, oats, lentils, beans, and whole grains supports digestion and fullness. Increasing fiber slowly with water is usually easier for the body.', 'images/fiber.jpg', '4 min read', CURDATE(), FALSE),
+(8, 'Pre-Workout and Post-Workout Meal Basics', 'Fitness Nutrition', 'BitBite Research Team', 'Learn what to eat before and after workouts.', 'Before workouts, easy carbohydrates can provide energy. After workouts, protein plus carbohydrates supports recovery and muscle repair.', 'images/workout-meal.jpg', '5 min read', CURDATE(), TRUE),
+(9, 'Healthy Weight Gain the Right Way', 'Weight Gain', 'BitBite Research Team', 'Weight gain should focus on calories, protein and consistency.', 'Healthy weight gain means increasing calories with nutrient-rich foods like rice, eggs, milk, nuts, chicken, fish, dal, and smoothies while following strength training if possible.', 'images/weight-gain.jpg', '5 min read', CURDATE(), FALSE),
+(10, 'How Consistency Beats Perfect Dieting', 'Healthy Habits', 'BitBite Research Team', 'Small habits done regularly work better than extreme plans.', 'A perfect diet is hard to maintain. Simple habits like eating enough protein, drinking water, walking, sleeping well, and tracking progress create better long-term results.', 'images/consistency.jpg', '4 min read', CURDATE(), TRUE)
+ON DUPLICATE KEY UPDATE
+title=VALUES(title), category=VALUES(category), author_name=VALUES(author_name), article_summary=VALUES(article_summary), article_content=VALUES(article_content), image_url=VALUES(image_url), reading_time=VALUES(reading_time), published_date=VALUES(published_date), is_featured=VALUES(is_featured);
+
+-- =========================
+-- REWARDS CENTER UPDATE
+-- =========================
+CREATE TABLE IF NOT EXISTS reward_catalog (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    reward_name VARCHAR(150) NOT NULL,
+    reward_type VARCHAR(100) NOT NULL,
+    description TEXT,
+    points_required INT DEFAULT 100,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS user_rewards (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    reward_id INT NOT NULL,
+    goal_snapshot VARCHAR(100),
+    current_weight DECIMAL(6,2),
+    target_weight DECIMAL(6,2),
+    status VARCHAR(50) DEFAULT 'Claimed',
+    claimed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_user_reward (user_id, reward_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (reward_id) REFERENCES reward_catalog(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO reward_catalog
+(id, reward_name, reward_type, description, points_required, is_active)
+VALUES
+(1, 'BitBite Target Complete T-shirt', 'T-shirt', 'A special BitBite T-shirt for users who complete their target goal.', 100, TRUE),
+(2, 'Target Complete Bracelet', 'Bracelet', 'A simple bracelet that represents consistency, discipline, and target completion.', 100, TRUE),
+(3, 'BitBite Fitness Wrist Band', 'Wrist band', 'A sporty wrist band reward for users who successfully reach their target weight goal.', 100, TRUE),
+(4, 'Healthy Habit Badge', 'Digital badge', 'A digital badge saved in your profile after completing your goal.', 100, TRUE),
+(5, 'Premium Meal Plan Coupon', 'Coupon', 'A coupon-style reward for a future premium meal plan or consultation support.', 100, TRUE)
+ON DUPLICATE KEY UPDATE
+reward_name=VALUES(reward_name), reward_type=VALUES(reward_type), description=VALUES(description), points_required=VALUES(points_required), is_active=VALUES(is_active);
+
+-- =====================================================
+-- BitBite Extra Update: Challenges, Streaks, Saved Articles, Reward Delivery, Admin Panel
+-- Run this after the previous SQL update in phpMyAdmin.
+-- =====================================================
+
+USE bitbite_db;
+
+CREATE TABLE IF NOT EXISTS daily_challenges (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(180) NOT NULL,
+    challenge_type VARCHAR(100) DEFAULT 'Daily',
+    description TEXT,
+    points INT DEFAULT 10,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS user_challenge_completions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    challenge_id INT NOT NULL,
+    completed_date DATE DEFAULT (CURRENT_DATE),
+    points_earned INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_daily_challenge (user_id, challenge_id, completed_date),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (challenge_id) REFERENCES daily_challenges(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS saved_articles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    article_id INT NOT NULL,
+    saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_saved_article (user_id, article_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (article_id) REFERENCES research_hub_articles(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Add reward delivery columns safely for XAMPP/MariaDB/MySQL
+SET @col_exists := (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_rewards' AND COLUMN_NAME = 'phone');
+SET @sql := IF(@col_exists = 0, 'ALTER TABLE user_rewards ADD COLUMN phone VARCHAR(30) NULL', 'SELECT "phone column already exists"');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @col_exists := (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_rewards' AND COLUMN_NAME = 'delivery_address');
+SET @sql := IF(@col_exists = 0, 'ALTER TABLE user_rewards ADD COLUMN delivery_address TEXT NULL', 'SELECT "delivery_address column already exists"');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @col_exists := (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_rewards' AND COLUMN_NAME = 'tshirt_size');
+SET @sql := IF(@col_exists = 0, 'ALTER TABLE user_rewards ADD COLUMN tshirt_size VARCHAR(20) NULL', 'SELECT "tshirt_size column already exists"');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @col_exists := (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_rewards' AND COLUMN_NAME = 'delivery_note');
+SET @sql := IF(@col_exists = 0, 'ALTER TABLE user_rewards ADD COLUMN delivery_note TEXT NULL', 'SELECT "delivery_note column already exists"');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+INSERT INTO daily_challenges
+(id, title, challenge_type, description, points, is_active) VALUES
+(1, 'Drink 8 cups of water', 'Hydration', 'Complete your daily hydration target and keep your body energized.', 10, TRUE),
+(2, 'Log one healthy meal', 'Food Log', 'Add at least one food log today to stay aware of your nutrition.', 10, TRUE),
+(3, 'Read one health article', 'Research', 'Read any article from the Research Hub and save your learning history.', 10, TRUE),
+(4, 'Walk for 20 minutes', 'Activity', 'Complete a short walk or light activity session.', 15, TRUE),
+(5, 'Review your sleep habit', 'Sleep', 'Check or log your sleep habit to support recovery.', 10, TRUE),
+(6, 'Update weight progress', 'Progress', 'Add or review your weight progress toward your target goal.', 10, TRUE),
+(7, 'Plan tomorrow meal', 'Meal Planning', 'Open your meal plan or prepare a simple healthy meal idea for tomorrow.', 10, TRUE)
+ON DUPLICATE KEY UPDATE
+    title = VALUES(title),
+    challenge_type = VALUES(challenge_type),
+    description = VALUES(description),
+    points = VALUES(points),
+    is_active = VALUES(is_active);
